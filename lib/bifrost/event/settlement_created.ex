@@ -5,12 +5,11 @@ defmodule Bifrost.Event.SettlementCreated do
 
   use Bifrost.Event.Notation
 
-  defevent settlement_id: Zc.non_empty_string(),
-           product_pricing_percentage: Z.float(min: 0),
-           product_pricing_fixed_amount: Zc.money(),
-           currency: Zc.currency(),
-           amount: Zc.money(),
-           platform_fee: Zc.money(),
+  defevent currency: Zc.currency(),
+           amount: Zc.money(:cents),
+           platform_pricing_percentage: Zc.percentage(),
+           platform_pricing_fixed_amount: Zc.money(:cents),
+           platform_fee: Zc.money(:cents),
            meta: Zc.meta() |> Z.default(%{}),
            idempotency_key: Zc.non_empty_string() |> Z.optional()
 end

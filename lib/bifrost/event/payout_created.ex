@@ -10,7 +10,7 @@ defmodule Bifrost.Event.PayoutCreated do
           bank_transfer_iban:
             Z.strict_map(%{
               bank: Zc.non_empty_string() |> Z.optional(),
-              # ↑ there are old records on v1 where bank is null / missing
+              # ↑ there are some records where :bank missing
               iban: Zc.non_empty_string()
             })
         })
@@ -26,7 +26,10 @@ defmodule Bifrost.Event.PayoutCreated do
 
   @sinpe Z.strict_map(%{
            type: Z.literal(:sinpe_movil),
-           sinpe_movil: Z.strict_map(%{movil: Zc.non_empty_string()})
+           sinpe_movil:
+            Z.strict_map(%{
+              movil: Zc.non_empty_string()
+            })
          })
 
   @method Z.discriminated_union(:type, [
@@ -35,11 +38,11 @@ defmodule Bifrost.Event.PayoutCreated do
             @sinpe
           ])
 
-  defevent payout_id: Zc.non_empty_string(),
-           product_pricing_percentage: Z.float(min: 0),
-           product_pricing_fixed_amount: Zc.money(),
-           currency: Zc.currency(),
-           amount: Zc.money(),
+  defevent currency: Zc.currency(),
+           amount: Zc.money(:cents),
+           platform_pricing_percentage: Zc.percentage(),
+           platform_pricing_fixed_amount: Zc.money(:cents),
+           platform_fee: Zc.money(:cents),
            method: @method,
            customer: Zc.contact() |> Z.default(%{}),
            meta: Zc.meta() |> Z.default(%{}),

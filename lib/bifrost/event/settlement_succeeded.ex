@@ -10,8 +10,10 @@ defmodule Bifrost.Event.SettlementSucceeded do
              Z.strict_map(%{
                id: Zc.non_empty_string(),
                provider_id: Zc.non_empty_string(),
-               amount: Zc.money(),
-               provider_fee: Zc.money(),
+               paid_amount: Zc.money(:cents),
+               provider_pricing_percentage: Zc.percentage(),
+               provider_pricing_fixed_amount: Zc.money(:cents),
+               provider_fee: Zc.money(:cents),
                sent_at: Z.date_time()
              })
              |> Z.list(min: 1)

@@ -5,10 +5,14 @@ defmodule Bifrost.Event.PaymentSucceeded do
 
   use Bifrost.Event.Notation
 
-  defevent payment_id: Zc.non_empty_string(),
-           end_to_end_id: Zc.non_empty_string() |> Z.optional(),
-           paid_amount: Zc.money(),
-           provider_fee: Zc.money(),
-           platform_fee: Zc.money(),
+  defevent end_to_end_id: Zc.non_empty_string() |> Z.optional(),
+           # ↑ only available on pix payments
+           paid_amount: Zc.money(:cents),
+           provider_pricing_percentage: Zc.percentage(),
+           provider_pricing_fixed_amount: Zc.money(:cents),
+           provider_fee: Zc.money(:cents),
+           platform_pricing_percentage: Zc.percentage(),
+           platform_pricing_fixed_amount: Zc.money(:cents),
+           platform_fee: Zc.money(:cents),
            payer: Zc.contact() |> Z.default(%{})
 end

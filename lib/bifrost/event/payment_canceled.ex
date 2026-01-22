@@ -5,6 +5,5 @@ defmodule Bifrost.Event.PaymentCanceled do
 
   use Bifrost.Event.Notation
 
-  defevent payment_id: Zc.non_empty_string(),
-           canceled_reason: Zc.non_empty_string() |> Z.optional()
+  defevent canceled_reason: Zc.non_empty_string() |> Z.optional()
 end

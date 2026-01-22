@@ -19,7 +19,13 @@ defmodule Bifrost.Event.PaymentCreated do
 
   @pix Z.strict_map(%{
          type: Z.literal(:pix),
-         pix: Z.strict_map(%{uri: Z.uri()})
+         pix:
+         Z.strict_map(%{
+            uri: Zc.non_empty_string() |> Z.contains("gov.bcb.pix")
+            # ↑ can't use `Z.uri/0` because pix's URI can have
+            #   whitespaces, which are not allowed according to
+            #   RFC 3986
+          })
        })
 
   @sinpe Z.strict_map(%{
@@ -29,7 +35,8 @@ defmodule Bifrost.Event.PaymentCreated do
                beneficiary_name: Zc.non_empty_string(),
                beneficiary_document: Zc.non_empty_string(),
                bank: Zc.non_empty_string() |> Z.optional(),
-               movil: Zc.non_empty_string(),
+               # ↑ there are some records where :bank missing
+               movil: Z.numeric(min: 8, max: 9),
                correlation_key: Zc.non_empty_string()
              })
          })
@@ -40,16 +47,17 @@ defmodule Bifrost.Event.PaymentCreated do
             @sinpe
           ])
 
-  defevent payment_id: Zc.non_empty_string(),
-           request_id: Zc.non_empty_string(),
+  defevent request_id: Zc.non_empty_string(),
            provider_id: Zc.non_empty_string(),
            provider_payment_id: Zc.non_empty_string(),
-           product_pricing_percentage: Z.float(min: 0),
-           product_pricing_fixed_amount: Zc.money(),
            end_to_end_id: Zc.non_empty_string() |> Z.optional(),
+           # ↑ only available to PIX payments
+           #   most providers only provide it when the payment succeeds
            currency: Zc.currency(),
-           amount: Zc.money(),
+           amount: Zc.money(:cents),
            customer: Zc.contact() |> Z.default(%{}),
+           # ↑ only required by some pix payment providers, where they
+           #   require the customer's CPF or CNPJ
            method: @method,
            meta: Zc.meta() |> Z.default(%{}),
            idempotency_key: Zc.non_empty_string() |> Z.optional(),

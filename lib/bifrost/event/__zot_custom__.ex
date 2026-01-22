@@ -32,8 +32,11 @@ defmodule Bifrost.Event.ZotCustom do
   end
 
   @doc false
-  def money, do: Z.int(min: 0)
+  def money(:cents), do: Z.int(min: 0)
 
   @doc false
   def non_empty_string, do: Z.string(trim: true, min: 1)
+
+  @doc false
+  def percentage(precision \\ 4), do: Z.float(min: 0, max: 1, precision: precision)
 end
