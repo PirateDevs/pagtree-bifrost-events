@@ -5,8 +5,7 @@ defmodule Bifrost.Event.SettlementSucceeded do
 
   use Bifrost.Event.Notation
 
-  defevent settlement_id: Zc.non_empty_string(),
-           splits:
+  defevent splits:
              Z.strict_map(%{
                id: Zc.non_empty_string(),
                provider_id: Zc.non_empty_string(),
