@@ -44,10 +44,25 @@ defmodule Bifrost.Event do
             payload: nil,
             timestamp: nil
 
+  @envs [:live, :sandbox]
+
+  @types [
+    :payment_canceled,
+    :payment_created,
+    :payment_refunded,
+    :payment_succeeded,
+    :payout_canceled,
+    :payout_created,
+    :payout_refunded,
+    :payout_succeeded,
+    :settlement_created,
+    :settlement_succeeded
+  ]
+
   @base Z.strict_map(%{
           id: Z.int(min: 1),
           merchant_id: Z.string(trim: true, min: 1),
-          env_type: Z.enum([:live, :sandbox]),
+          env_type: Z.enum(@envs),
           subject_id: Z.string(trim: true, min: 1),
           timestamp: Z.date_time()
         })
@@ -70,7 +85,9 @@ defmodule Bifrost.Event do
   """
   @spec meta(atom) :: term
 
+  def meta(:envs), do: @envs
   def meta(:schema), do: @schema
+  def meta(:types), do: @types
 
   @doc ~S"""
   Parses and validates the given params into a Bifrost event.
