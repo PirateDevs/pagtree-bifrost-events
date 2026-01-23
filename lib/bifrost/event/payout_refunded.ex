@@ -6,5 +6,5 @@ defmodule Bifrost.Event.PayoutRefunded do
   use Bifrost.Event.Notation
 
   defevent refunded_amount: Zc.money(:cents),
-           refunded_reason: Zc.non_empty_string() |> Z.optional()
+           refunded_reason: Z.string(trim: true) |> Zc.empty_as_nil() |> Z.optional()
 end

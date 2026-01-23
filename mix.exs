@@ -13,6 +13,7 @@ defmodule BifrostCommons.MixProject do
 
   defp deps do
     [
+      {:ecto, "~> 3.13"},
       {:jason, "~> 1.4"},
       {:req, "~> 0.5"},
       {:zot, ">= 0.0.0"}

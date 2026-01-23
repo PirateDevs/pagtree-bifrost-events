@@ -19,7 +19,8 @@ defmodule Bifrost.Event.PayoutCreated do
          type: Z.literal(:pix),
          pix:
            Z.strict_map(%{
-             key_type: Z.enum([:cpf, :cnpf, :email, :phone, :random]),
+             key_type: Z.enum([:cpf, :cnpj, :email, :phone, :random]) |> Z.optional(),
+             # ↑ there's lost of records missing :key_type on v1
              key: Zc.non_empty_string()
            })
        })

@@ -22,6 +22,10 @@ defmodule Bifrost.Event.ZotCustom do
   def currency, do: Z.enum([:BRL, :CRC])
 
   @doc false
+  def empty_as_nil(%Zot.Type.String{} = type),
+    do: Z.transform(type, {__MODULE__, :__empty_as_nil__, []})
+
+  @doc false
   def env_type, do: Z.enum([:live, :sandbox])
 
   @doc false
@@ -39,4 +43,13 @@ defmodule Bifrost.Event.ZotCustom do
 
   @doc false
   def percentage(precision \\ 4), do: Z.float(min: 0, max: 1, precision: precision)
+
+  #
+  #   CALLBACKS
+  #
+
+  @doc false
+  def __empty_as_nil__(value)
+      when is_binary(value),
+      do: with("" <- value, do: nil)
 end
