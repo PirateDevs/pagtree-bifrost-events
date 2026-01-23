@@ -12,15 +12,6 @@ defmodule Bifrost.Event.Notation do
 
       alias Zot, as: Z
       alias Bifrost.Event.ZotCustom, as: Zc
-
-      defimpl Jason.Encoder do
-        def encode(event, opts) do
-          event
-          |> Map.from_struct()
-          |> Map.delete(:__bifrost_event__)
-          |> Jason.Encode.map(opts)
-        end
-      end
     end
   end
 
@@ -63,6 +54,15 @@ defmodule Bifrost.Event.Notation do
         case parse(params) do
           {:ok, struct} -> struct
           {:error, issues} -> raise(ArgumentError, Zot.Issue.summarize(issues))
+        end
+      end
+
+      defimpl Jason.Encoder do
+        def encode(event, opts) do
+          event
+          |> Map.from_struct()
+          |> Map.delete(:__bifrost_event__)
+          |> Jason.Encode.map(opts)
         end
       end
     end

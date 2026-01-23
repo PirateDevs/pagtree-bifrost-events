@@ -47,16 +47,16 @@ defmodule Bifrost.Event do
   @envs [:live, :sandbox]
 
   @types [
-    :payment_canceled,
-    :payment_created,
-    :payment_refunded,
-    :payment_succeeded,
-    :payout_canceled,
-    :payout_created,
-    :payout_refunded,
-    :payout_succeeded,
-    :settlement_created,
-    :settlement_succeeded
+    payment_canceled:     PaymentCanceled,
+    payment_created:      PaymentCreated,
+    payment_refunded:     PaymentRefunded,
+    payment_succeeded:    PaymentSucceeded,
+    payout_canceled:      PayoutCanceled,
+    payout_created:       PayoutCreated,
+    payout_refunded:      PayoutRefunded,
+    payout_succeeded:     PayoutSucceeded,
+    settlement_created:   SettlementCreated,
+    settlement_succeeded: SettlementSucceeded
   ]
 
   @base Z.strict_map(%{
@@ -77,7 +77,7 @@ defmodule Bifrost.Event do
             Z.strict_map(%{type: Z.literal(:payout_refunded),      payload: PayoutRefunded.meta(:schema)})      |> Z.merge(@base),
             Z.strict_map(%{type: Z.literal(:payout_succeeded),     payload: PayoutSucceeded.meta(:schema)})     |> Z.merge(@base),
             Z.strict_map(%{type: Z.literal(:settlement_created),   payload: SettlementCreated.meta(:schema)})   |> Z.merge(@base),
-            Z.strict_map(%{type: Z.literal(:settlement_succeeded), payload: SettlementSucceeded.meta(:schema)}) |> Z.merge(@base)
+            Z.strict_map(%{type: Z.literal(:settlement_succeeded), payload: SettlementSucceeded.meta(:schema)}) |> Z.merge(@base),
           ])
 
   @doc ~S"""
@@ -87,7 +87,7 @@ defmodule Bifrost.Event do
 
   def meta(:envs), do: @envs
   def meta(:schema), do: @schema
-  def meta(:types), do: @types
+  def meta(:types), do: Keyword.keys(@types)
 
   @doc ~S"""
   Parses and validates the given params into a Bifrost event.
@@ -96,7 +96,11 @@ defmodule Bifrost.Event do
 
   def parse(params) do
     with {:ok, data} <- Z.parse(@schema, params, coerce: true),
-         do: {:ok, struct!(__MODULE__, data)}
+         do: {:ok, struct!(__MODULE__, %{data | payload: s!(data.type, data.payload)})}
+  end
+
+  for {event, mod} <- @types do
+    defp s!(unquote(event), payload), do: struct!(unquote(mod), payload)
   end
 
   @doc ~S"""
