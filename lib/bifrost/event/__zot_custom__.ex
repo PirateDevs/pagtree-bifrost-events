@@ -30,7 +30,13 @@ defmodule Bifrost.Event.ZotCustom do
 
   @doc false
   def meta do
-    [Z.string(max: 255), Z.number(), Z.boolean()]
+    [
+      Z.string(max: 255),
+      Z.number(),
+      Z.boolean(),
+      # ↓ throw away invalid values
+      Z.any() |> Z.transform({__MODULE__, :__nil__, []})
+    ]
     |> Z.union()
     |> Z.record()
   end
@@ -52,4 +58,7 @@ defmodule Bifrost.Event.ZotCustom do
   def __empty_as_nil__(value)
       when is_binary(value),
       do: with("" <- value, do: nil)
+
+  @doc false
+  def __nil__(_), do: nil
 end
