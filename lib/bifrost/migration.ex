@@ -16,6 +16,9 @@ defmodule Bifrost.Migration do
         add :timestamp, :utc_datetime_usec, null: false
       end
 
+      # prevent duplicated events
+      create unique_index(:bifrost_outbox, [:subject_id, :type])
+
       # for streaming events that belong to a specific merchant
       create index(:bifrost_outbox, [:merchant_id, "id ASC"])
 
@@ -29,6 +32,9 @@ defmodule Bifrost.Migration do
         add :timestamp, :utc_datetime_usec, null: false
       end
 
+      # prevent duplicated events
+      create unique_index(:bifrost_inbox, [:subject_id, :type])
+
       # for streaming events that belong to a specific merchant
       create index(:bifrost_inbox, [:merchant_id, "id ASC"])
     end
@@ -38,8 +44,10 @@ defmodule Bifrost.Migration do
   defmacro down(1) do
     quote do
       drop_if_exists index(:bifrost_inbox, [:merchant_id, "id ASC"])
+      drop_if_exists unique_index(:bifrost_inbox, [:subject_id, :type])
       drop_if_exists table(:bifrost_inbox)
       drop_if_exists index(:bifrost_outbox, [:merchant_id, "id ASC"])
+      drop_if_exists unique_index(:bifrost_outbox, [:subject_id, :type])
       drop_if_exists table(:bifrost_outbox)
     end
   end
