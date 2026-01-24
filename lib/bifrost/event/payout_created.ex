@@ -39,7 +39,8 @@ defmodule Bifrost.Event.PayoutCreated do
             @sinpe
           ])
 
-  defevent currency: Zc.currency(),
+  defevent request_id: Zc.non_empty_string(),
+           currency: Zc.currency(),
            amount: Zc.money(:cents),
            platform_pricing_percentage: Zc.percentage(),
            platform_pricing_fixed_amount: Zc.money(:cents),
