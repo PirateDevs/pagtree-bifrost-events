@@ -16,6 +16,9 @@ defmodule Bifrost.Event do
   alias Bifrost.Event.SettlementSucceeded
   alias Zot, as: Z
 
+  @doc ~S"""
+  The shape of a Bifrost Event.
+  """
   @type t :: %Event{
           id: pos_integer,
           type: atom,
