@@ -40,6 +40,9 @@ defmodule Bifrost.Event.PayoutCreated do
           ])
 
   defevent request_id: Zc.non_empty_string(),
+           end_to_end_id: Zc.non_empty_string() |> Z.optional(),
+           # ↑ 1. only available to pix payouts
+           #   2. most providers only provide it when the payout succeeds
            currency: Zc.currency(),
            amount: Zc.money(:cents),
            platform_pricing_percentage: Zc.percentage(),
