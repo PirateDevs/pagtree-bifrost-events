@@ -6,9 +6,11 @@ defmodule Bifrost.Event.PayoutSucceeded do
   use Bifrost.Event.Notation
 
   defevent end_to_end_id: Zc.non_empty_string() |> Z.optional(),
-           # ↑ only available on pix payouts
+           # ↑ 1. only available to pix payouts
+           #   2. most providers only provide it when the payout succeeds
            provider_id: Zc.non_empty_string(),
-           provider_payout_id: Zc.non_empty_string() |> Z.optional(),
+           provider_payout_id: Zc.non_empty_string(),
+           #  provider_payout_id: Zc.non_empty_string() |> Z.optional(),
            # ↑ there's some records where this is missing, probably tests
            provider_pricing_percentage: Zc.percentage(),
            provider_pricing_fixed_amount: Zc.money(:cents),

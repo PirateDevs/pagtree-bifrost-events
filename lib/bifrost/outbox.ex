@@ -7,14 +7,11 @@ defmodule Bifrost.Outbox do
 
   import Ecto.Query
 
-  @types Bifrost.Event.meta(:types)
-  @envs Bifrost.Event.meta(:envs)
-
   @primary_key {:id, :id, autogenerate: true}
   schema "bifrost_outbox" do
-    field :type, Ecto.Enum, values: @types
+    field :type, Ecto.Enum, values: Bifrost.Event.meta(:types)
     field :merchant_id, :string
-    field :env_type, Ecto.Enum, values: @envs
+    field :env_type, Ecto.Enum, values: Bifrost.Event.meta(:envs)
     field :subject_id, :string
     field :payload, :map
     field :timestamp, :utc_datetime_usec

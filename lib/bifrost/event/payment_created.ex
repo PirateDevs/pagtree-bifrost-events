@@ -22,9 +22,8 @@ defmodule Bifrost.Event.PaymentCreated do
          pix:
          Z.strict_map(%{
             uri: Zc.non_empty_string() |> Z.contains("gov.bcb.pix")
-            # ↑ can't use `Z.uri/0` because pix's URI can have
-            #   whitespaces, which are not allowed according to
-            #   RFC 3986
+            # ↑ can't use `Z.uri/0` because a pix's URI can have
+            #   whitespaces, which is not allowed according to RFC 3986
           })
        })
 
@@ -51,8 +50,8 @@ defmodule Bifrost.Event.PaymentCreated do
            provider_id: Zc.non_empty_string(),
            provider_payment_id: Zc.non_empty_string(),
            end_to_end_id: Zc.non_empty_string() |> Z.optional(),
-           # ↑ only available to PIX payments
-           #   most providers only provide it when the payment succeeds
+           # ↑ 1. only available to pix payments
+           #   2. most providers only provide it when the payment succeeds
            currency: Zc.currency(),
            amount: Zc.money(:cents),
            customer: Zc.contact() |> Z.default(%{}),
