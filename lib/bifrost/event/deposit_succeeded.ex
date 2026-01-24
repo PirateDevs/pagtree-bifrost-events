@@ -5,10 +5,7 @@ defmodule Bifrost.Event.DepositSucceeded do
 
   use Bifrost.Event.Notation
 
-  defevent end_to_end_id: Zc.non_empty_string() |> Z.optional(),
-           # ↑ 1. only available on pix deposits
-           #   2. missing on manual deposits
-           paid_amount: Zc.money(:cents),
+  defevent paid_amount: Zc.money(:cents),
            provider_pricing_percentage: Zc.percentage(),
            provider_pricing_fixed_amount: Zc.money(:cents),
            provider_fee: Zc.money(:cents),
