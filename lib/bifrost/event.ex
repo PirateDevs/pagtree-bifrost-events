@@ -4,6 +4,8 @@ defmodule Bifrost.Event do
   """
 
   alias __MODULE__, as: Event
+  alias Bifrost.Event.DepositCreated
+  alias Bifrost.Event.DepositSucceeded
   alias Bifrost.Event.PaymentCanceled
   alias Bifrost.Event.PaymentCreated
   alias Bifrost.Event.PaymentRefunded
@@ -16,9 +18,7 @@ defmodule Bifrost.Event do
   alias Bifrost.Event.SettlementSucceeded
   alias Zot, as: Z
 
-  @doc ~S"""
-  The shape of a Bifrost Event.
-  """
+  @doc false
   @type t :: %Event{
           id: pos_integer,
           type: atom,
@@ -26,7 +26,9 @@ defmodule Bifrost.Event do
           env_type: :live | :sandbox,
           subject_id: String.t(),
           payload:
-            %PaymentCanceled{}
+            %DepositCreated{}
+            | %DepositSucceeded{}
+            | %PaymentCanceled{}
             | %PaymentCreated{}
             | %PaymentRefunded{}
             | %PaymentSucceeded{}
@@ -49,7 +51,35 @@ defmodule Bifrost.Event do
 
   @envs [:live, :sandbox]
 
+  @base Z.strict_map(%{
+          id: Z.int(min: 1),
+          merchant_id: Z.string(trim: true, min: 1),
+          env_type: Z.enum(@envs),
+          subject_id: Z.string(trim: true, min: 1),
+          timestamp: Z.date_time()
+        })
+
+  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+  # HOW TO ADD NEW EVENTS                                           #
+  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+  # 1. Create an event module under `lib/bifrost/event/`. See other #
+  #    event modules for reference.                                 #
+  # 2. Alias the event module at the top of this file. Keep it      #
+  #    sorted alphabetically!                                       #
+  # 3. Add the event to the `@type t` spec under `:payload`. See    #
+  #    other events for reference and keep it sorted                #
+  #    alphabetically!                                              #
+  # 4. Add the event to the `@types` below where the key is the     #
+  #    atom event name and the value is the module. Keep it sorted  #
+  #    alphabetically!                                              #
+  # 5. Add the event to the `@schema` distinct union below. See     #
+  #    other events for reference and keep it sorted                #
+  #    alphabetically!                                              #
+  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
   @types [
+    deposit_created:      DepositCreated,
+    deposit_succeeded:    DepositSucceeded,
     payment_canceled:     PaymentCanceled,
     payment_created:      PaymentCreated,
     payment_refunded:     PaymentRefunded,
@@ -62,15 +92,15 @@ defmodule Bifrost.Event do
     settlement_succeeded: SettlementSucceeded
   ]
 
-  @base Z.strict_map(%{
-          id: Z.int(min: 1),
-          merchant_id: Z.string(trim: true, min: 1),
-          env_type: Z.enum(@envs),
-          subject_id: Z.string(trim: true, min: 1),
-          timestamp: Z.date_time()
-        })
-
+  # #
+  # **IMPORTANT:**
+  #   Parsing this schema must produce a plain map - no structs
+  #   used. This is important because there are hot operations that
+  #   need to parse events where structs would add unnecessary
+  #   overhead.
   @schema Z.discriminated_union(:type, [
+            Z.strict_map(%{type: Z.literal(:deposit_created),      payload: DepositCreated.meta(:schema)})      |> Z.merge(@base),
+            Z.strict_map(%{type: Z.literal(:deposit_succeeded),    payload: DepositSucceeded.meta(:schema)})    |> Z.merge(@base),
             Z.strict_map(%{type: Z.literal(:payment_canceled),     payload: PaymentCanceled.meta(:schema)})     |> Z.merge(@base),
             Z.strict_map(%{type: Z.literal(:payment_created),      payload: PaymentCreated.meta(:schema)})      |> Z.merge(@base),
             Z.strict_map(%{type: Z.literal(:payment_refunded),     payload: PaymentRefunded.meta(:schema)})     |> Z.merge(@base),
@@ -86,14 +116,16 @@ defmodule Bifrost.Event do
   @doc ~S"""
   Returns metadata about this struct.
   """
-  @spec meta(atom) :: term
+  @spec meta(key) :: [atom, ...] when key: :envs
+  @spec meta(key) :: Zot.Type.Map.t() when key: :schema
+  @spec meta(key) :: [atom, ...] when key: :types
 
   def meta(:envs), do: @envs
   def meta(:schema), do: @schema
   def meta(:types), do: Keyword.keys(@types)
 
   @doc ~S"""
-  Parses and validates the given params into a Bifrost event.
+  Parses and validates the given params into a `Bifrost.Event`.
   """
   @spec parse(term) :: {:ok, %Event{}} | {:error, [Zot.Issue.t(), ...]}
 
@@ -107,7 +139,9 @@ defmodule Bifrost.Event do
   end
 
   @doc ~S"""
-  Same as `parse/1` but raises on error if parsing / validation fails.
+  Parses and validates the given params into a `Bifrost.Event`.
+
+  Same as `parse/1` but raises when failed.
   """
   @spec parse!(term) :: %Event{}
 
