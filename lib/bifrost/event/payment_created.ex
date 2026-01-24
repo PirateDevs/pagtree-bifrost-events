@@ -46,7 +46,7 @@ defmodule Bifrost.Event.PaymentCreated do
             @sinpe
           ])
 
-  defevent request_id: Zc.non_empty_string(),
+  defevent request_id: Zc.non_empty_string() |> Z.optional(),
            provider_id: Zc.non_empty_string(),
            provider_payment_id: Zc.non_empty_string(),
            end_to_end_id: Zc.non_empty_string() |> Z.optional(),
