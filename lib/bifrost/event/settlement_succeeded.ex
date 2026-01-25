@@ -7,7 +7,6 @@ defmodule Bifrost.Event.SettlementSucceeded do
 
   defevent splits:
              Z.strict_map(%{
-               id: Zc.non_empty_string(),
                provider_id: Zc.non_empty_string(),
                paid_amount: Zc.money(:cents),
                provider_pricing_percentage: Zc.percentage(),
