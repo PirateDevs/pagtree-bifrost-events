@@ -24,9 +24,9 @@ defmodule Bifrost.Inbox do
       when is_list(filters)
       when is_non_struct_map(filters) do
     Enum.reduce(filters, __MODULE__, fn
-      query, {:merchant_id, id} -> where(query, [rec], rec.merchant_id == ^id)
-      query, {:after, cursor} -> where(query, [rec], rec.id > ^cursor)
-      query, {:take, n} -> limit(query, ^n)
+      {:merchant_id, id}, query -> where(query, [rec], rec.merchant_id == ^id)
+      {:after, cursor}, query -> where(query, [rec], rec.id > ^cursor)
+      {:take, n}, query -> limit(query, ^n)
     end)
   end
 end
