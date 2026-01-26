@@ -19,9 +19,11 @@ defmodule Bifrost.Heimdall do
     quote do
       @behaviour Plug
 
-      #
-      #   METHODS
-      #
+      @impl Plug
+      def init(opts), do: unquote(__MODULE__).init(opts, unquote(otp_app))
+
+      @impl Plug
+      def call(conn, opts), do: unquote(__MODULE__).call(conn, opts, unquote(otp_app))
 
       @doc ~S"""
       Authorizes an outgoing request to interact with Bifrost's API.
@@ -47,15 +49,6 @@ defmodule Bifrost.Heimdall do
 
       def enabled?, do: unquote(__MODULE__).enabled?(unquote(otp_app))
 
-      #
-      #   PLUG CALLBACKS
-      #
-
-      @impl Plug
-      def init(opts), do: unquote(__MODULE__).init(opts, unquote(otp_app))
-
-      @impl Plug
-      def call(conn, opts), do: unquote(__MODULE__).call(conn, opts, unquote(otp_app))
     end
   end
 
