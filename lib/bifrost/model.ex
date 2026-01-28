@@ -86,7 +86,7 @@ defmodule Bifrost.Model do
     fetcher =
       opts
       |> Keyword.take([:merchant_id])
-      |> Keyword.put(:batch_size, batch_size)
+      |> Keyword.put(:take, batch_size)
       |> create_fetcher(repo, query_builder)
 
     Stream.resource(fn -> start_cursor end, fetcher, fn _ -> :ok end)
@@ -99,7 +99,7 @@ defmodule Bifrost.Model do
   defp create_fetcher(defaults, repo, query_builder), do: &fetch(repo, query_builder, defaults, &1)
 
   defp fetch(repo, query_builder, defaults, cursor) do
-    batch_size = Keyword.fetch!(defaults, :batch_size)
+    batch_size = Keyword.fetch!(defaults, :take)
 
     query =
       defaults
@@ -116,6 +116,6 @@ defmodule Bifrost.Model do
   defp next_cursor([_ | _] = records) do
     records
     |> List.last()
-    |> Map.fetch!("id")
+    |> Map.fetch!(:id)
   end
 end
