@@ -6,6 +6,7 @@ defmodule Bifrost.Model do
   and streaming of records from the database.
   """
 
+  import Bifrost.Event, only: [parse!: 1]
   import Ecto.Query
 
   @doc ~S"""
@@ -24,6 +25,19 @@ defmodule Bifrost.Model do
                    | {:take, pos_integer}
 
       def query(filters), do: unquote(__MODULE__).query(__MODULE__, filters)
+
+      @doc ~S"""
+      Fetches many records matching the given filters, returning
+      parsed events.
+      """
+      @spec fetch(repo, [filter, ...]) :: [Bifrost.Event.t()]
+            when repo: Ecto.Repo.t(),
+                 filter:
+                    {:merchant_id, String.t()}
+                    | {:after, non_neg_integer}
+                    | {:take, pos_integer}
+
+      def fetch(repo, filters), do: unquote(__MODULE__).fetch(repo, __MODULE__, filters)
 
       @doc ~S"""
       Streams records from the database.
@@ -50,7 +64,7 @@ defmodule Bifrost.Model do
 
   def query(schema, filters)
       when is_atom(schema) and is_list(filters) do
-    Enum.reduce(filters, schema, fn
+    Enum.reduce(filters, from(rec in schema, order_by: [asc: rec.id]), fn
       {_, nil},                 query                     -> query
       {:type, in: types},       query when is_list(types) -> where(query, [rec], rec.type in ^types)
       {:type, type},            query                     -> where(query, [rec], rec.type == ^type)
@@ -64,6 +78,28 @@ defmodule Bifrost.Model do
       {:after, cursor},         query                     -> where(query, [rec], rec.id > ^cursor)
       {:take, n},               query                     -> limit(query, ^n)
     end)
+  end
+
+  @doc ~S"""
+  Fetches many records matching the given filters, returning
+  parsed events.
+  """
+  @spec fetch(repo, schema, [filter, ...]) :: [Bifrost.Event.t()]
+        when repo: Ecto.Repo.t(),
+             schema: Ecto.Schema.schema(),
+             filter:
+               {:merchant_id, String.t()}
+               | {:after, non_neg_integer}
+               | {:take, pos_integer}
+
+  def fetch(repo, schema, filters) do
+    filters = Keyword.take(filters, [:merchant_id, :after, :take])
+
+    schema
+    |> query(filters)
+    |> repo.all()
+    |> Enum.map(&Map.delete(Map.from_struct(&1), :__meta__))
+    |> Enum.map(&parse!/1)
   end
 
   @doc ~S"""

@@ -114,6 +114,15 @@ defmodule Bifrost.Event do
           ])
 
   @doc ~S"""
+  Pattern matches an event by its payload module.
+  """
+  defmacro event_type(mod) do
+    quote do
+      %unquote(__MODULE__){payload: %unquote(mod){}}
+    end
+  end
+
+  @doc ~S"""
   Returns metadata about this struct.
   """
   @spec meta(key) :: [atom, ...] when key: :envs
