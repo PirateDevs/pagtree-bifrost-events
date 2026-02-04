@@ -132,7 +132,8 @@ defmodule Bifrost.Model do
   #   PRIVATE
   #
 
-  defp create_fetcher(defaults, repo, query_builder), do: &fetch(repo, query_builder, defaults, &1)
+  defp create_fetcher(defaults, repo, query_builder),
+    do: &fetch(repo, query_builder, defaults, &1)
 
   defp fetch(repo, query_builder, defaults, cursor) do
     batch_size = Keyword.fetch!(defaults, :take)

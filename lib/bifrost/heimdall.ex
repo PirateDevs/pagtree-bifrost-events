@@ -48,13 +48,8 @@ defmodule Bifrost.Heimdall do
       @spec enabled?() :: boolean
 
       def enabled?, do: unquote(__MODULE__).enabled?(unquote(otp_app))
-
     end
   end
-
-  #
-  #   METHODS
-  #
 
   @doc ~S"""
   Authorizes an outgoing request to interact with Bifrost's API.
