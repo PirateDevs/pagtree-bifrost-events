@@ -1,9 +1,9 @@
-defmodule Tesseract.Event.PaymentRefunded do
+defmodule Bifrost.Event.PayoutRefunded do
   @moduledoc ~S"""
-  Event emitted when a Payment has been refunded.
+  Event emitted when a Payout has been refunded.
   """
 
-  use Tesseract.Event.Notation
+  use Bifrost.Event.Notation
 
   defevent refunded_amount: Zc.money(:cents),
            refunded_reason: Z.string(trim: true) |> Zc.empty_as_nil() |> Z.optional(),
@@ -11,6 +11,7 @@ defmodule Tesseract.Event.PaymentRefunded do
            # ↓ that's needed again to create the wallet transactions
            more: Z.strict_map(%{
              provider_id: Zc.non_empty_string(),
-             currency: Zc.currency()
+             currency: Zc.currency(),
+             platform_fee: Zc.money(:cents)
            })
 end

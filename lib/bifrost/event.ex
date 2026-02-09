@@ -1,21 +1,21 @@
-defmodule Tesseract.Event do
+defmodule Bifrost.Event do
   @moduledoc ~S"""
-  Captures a single change event within the system.
+  Captures an atomic-change event within the system.
   """
 
   alias __MODULE__, as: Event
-  alias Tesseract.Event.DepositCreated
-  alias Tesseract.Event.DepositSucceeded
-  alias Tesseract.Event.PaymentCanceled
-  alias Tesseract.Event.PaymentCreated
-  alias Tesseract.Event.PaymentRefunded
-  alias Tesseract.Event.PaymentSucceeded
-  alias Tesseract.Event.PayoutCanceled
-  alias Tesseract.Event.PayoutCreated
-  alias Tesseract.Event.PayoutRefunded
-  alias Tesseract.Event.PayoutSucceeded
-  alias Tesseract.Event.SettlementCreated
-  alias Tesseract.Event.SettlementSucceeded
+  alias Bifrost.Event.DepositCreated
+  alias Bifrost.Event.DepositSucceeded
+  alias Bifrost.Event.PaymentCanceled
+  alias Bifrost.Event.PaymentCreated
+  alias Bifrost.Event.PaymentRefunded
+  alias Bifrost.Event.PaymentSucceeded
+  alias Bifrost.Event.PayoutCanceled
+  alias Bifrost.Event.PayoutCreated
+  alias Bifrost.Event.PayoutRefunded
+  alias Bifrost.Event.PayoutSucceeded
+  alias Bifrost.Event.SettlementCreated
+  alias Bifrost.Event.SettlementSucceeded
   alias Zot, as: Z
 
   @doc ~S"""
@@ -140,7 +140,7 @@ defmodule Tesseract.Event do
   def meta(:types), do: Keyword.keys(@types)
 
   @doc ~S"""
-  Parses and validates the given params into a `Tesseract.Event`.
+  Parses and validates the given params into a `Bifrost.Event`.
   """
   @spec parse(map) :: {:ok, t} | {:error, [Zot.Issue.t(), ...]}
 
@@ -154,7 +154,7 @@ defmodule Tesseract.Event do
   end
 
   @doc ~S"""
-  Parses and validates the given params into a `Tesseract.Event`,
+  Parses and validates the given params into a `Bifrost.Event`,
   raising on parsing or validation errors.
   """
   @spec parse!(map) :: t

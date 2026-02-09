@@ -1,14 +1,14 @@
-defmodule Bifrost.LandingSite do
+defmodule Bifrost.Outpost do
   @moduledoc ~S"""
-  Bifrost landing site generator.
+  Bifrost outpost generator.
 
-  Define a module representing your landing site:
+  Define a module representing your outpost:
 
       defmodule Pag3.Bifrost do
-        use Bifrost.LandingSite, otp_app: :pag3
+        use Bifrost.Outpost, otp_app: :pag3
       end
 
-  Then add the configurations for the landing site:
+  Then add the configurations for the outpost:
 
       config :pag3, Pag3.Bifrost,
         enabled: true,
@@ -29,7 +29,7 @@ defmodule Bifrost.LandingSite do
 
     quote do
       @moduledoc """
-      Defines the #{unquote(m(caller))} Bifrost landing site.
+      Defines the #{unquote(m(caller))} Bifrost outpost.
       """
 
       defmodule unquote(heimdall) do
@@ -54,7 +54,7 @@ defmodule Bifrost.LandingSite do
         Heimdall will stare the given token for a while, eventually
         coming to the conclusion of whether or not this is a token He
         recognizes and trusts. Will return `false` if the Bifrost
-        landing site is disabled.
+        outpost is disabled.
         """
         @spec authorized?(bearer_token) :: boolean
               when bearer_token: String.t()
@@ -68,7 +68,7 @@ defmodule Bifrost.LandingSite do
 
       @doc ~S"""
       Returns `true` if Bifrost's inter-service communication is
-      enabled for this landing site.
+      enabled for this outpost.
       """
       @spec enabled?() :: boolean
 

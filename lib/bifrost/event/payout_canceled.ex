@@ -1,9 +1,9 @@
-defmodule Tesseract.Event.PayoutCanceled do
+defmodule Bifrost.Event.PayoutCanceled do
   @moduledoc ~S"""
   Event emitted when a payout has been canceled or has expired.
   """
 
-  use Tesseract.Event.Notation
+  use Bifrost.Event.Notation
 
   defevent canceled_reason: Z.string(trim: true) |> Zc.empty_as_nil() |> Z.optional(),
            #   info that was already sent in previous events but

@@ -4,7 +4,8 @@
   excludes: [
     "lib/bifrost/event.ex",
     "lib/bifrost/inbox.ex",
-    "lib/bifrost/outbox.ex"
+    "lib/bifrost/outbox.ex",
+    "lib/bifrost/outpost.ex"
   ],
   import_deps: [:ecto],
   plugins: [],

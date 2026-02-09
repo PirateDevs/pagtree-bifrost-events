@@ -1,10 +1,10 @@
-defmodule TesseractEmbedded.MixProject do
+defmodule BifrostCommons.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :tesseract_embedded,
-      version: "1.4.0",
+      app: :bifrost_commons,
+      version: "1.6.0",
       elixir: "~> 1.19",
       elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps()

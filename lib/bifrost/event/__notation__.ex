@@ -1,19 +1,19 @@
-defmodule Tesseract.Event.Notation do
+defmodule Bifrost.Event.Notation do
   @moduledoc ~S"""
-  Notation for defining Tesseract events.
+  Notation for defining Bifrost events.
   """
 
   @doc ~S"""
-  Use it to define a Tesseract event.
+  Use it to define a Bifrost event.
   """
   defmacro __using__(_) do
     quote do
-      @behaviour Tesseract.Event
+      @behaviour Bifrost.Event
 
       import unquote(__MODULE__), only: [defevent: 1]
 
       alias Zot, as: Z
-      alias Tesseract.Event.ZotCustom, as: Zc
+      alias Bifrost.Event.ZotCustom, as: Zc
     end
   end
 
@@ -32,16 +32,16 @@ defmodule Tesseract.Event.Notation do
       @derive {Jason.Encoder, only: unquote(ast_fields)}
       defstruct unquote(fields)
 
-      @impl Tesseract.Event
+      @impl Bifrost.Event
       def meta(:schema), do: @schema
 
-      @impl Tesseract.Event
+      @impl Bifrost.Event
       def parse(params) do
         with {:ok, params} <- Zot.parse(@schema, params, coerce: true),
              do: {:ok, struct!(__MODULE__, params)}
       end
 
-      @impl Tesseract.Event
+      @impl Bifrost.Event
       def parse!(params) do
         case parse(params) do
           {:ok, struct} -> struct

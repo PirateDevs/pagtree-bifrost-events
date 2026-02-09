@@ -1,13 +1,13 @@
 defmodule Bifrost.Inbox do
   @moduledoc ~S"""
-  Incomming events from Bifrost.
+  A store of incoming Bifrost events.
   """
 
   use Ecto.Schema
 
   import Ecto.Changeset
   import Ecto.Query
-  import Tesseract.Event, only: [parse!: 1]
+  import Bifrost.Event, only: [parse!: 1]
 
   alias __MODULE__
 
@@ -23,8 +23,8 @@ defmodule Bifrost.Inbox do
           timestamp: DateTime.t()
         }
 
-  @types Tesseract.Event.meta(:types)
-  @envs Tesseract.Event.meta(:envs)
+  @types Bifrost.Event.meta(:types)
+  @envs Bifrost.Event.meta(:envs)
 
   @primary_key {:id, :id, []}
   schema "bifrost_inbox" do
@@ -84,7 +84,7 @@ defmodule Bifrost.Inbox do
   Fetches many records matching the given filters, returning
   parsed events.
   """
-  @spec fetch(repo, [filter, ...]) :: [Tesseract.Event.t()]
+  @spec fetch(repo, [filter, ...]) :: [Bifrost.Event.t()]
         when repo: Ecto.Repo.t(),
              filter:
                {:merchant_id, String.t()}

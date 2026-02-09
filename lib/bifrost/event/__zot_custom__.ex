@@ -1,4 +1,4 @@
-defmodule Tesseract.Event.ZotCustom do
+defmodule Bifrost.Event.ZotCustom do
   @moduledoc ~S"""
   Zot custom types.
   """
