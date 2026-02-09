@@ -25,7 +25,7 @@ defmodule Bifrost.Outpost do
         do: raise(ArgumentError, "unknown option #{inspect(key)}")
 
     caller = __CALLER__.module
-    heimdall = Module.safe_concat([caller, "Heimdall"])
+    heimdall = Module.concat([caller, "Heimdall"])
 
     quote do
       @moduledoc """
