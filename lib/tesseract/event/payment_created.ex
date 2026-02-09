@@ -1,9 +1,9 @@
-defmodule Bifrost.Event.PaymentCreated do
+defmodule Tesseract.Event.PaymentCreated do
   @moduledoc ~S"""
   Event emitted when a Payment is created.
   """
 
-  use Bifrost.Event.Notation
+  use Tesseract.Event.Notation
 
   @iban Z.strict_map(%{
           type: Z.literal(:bank_transfer_iban),

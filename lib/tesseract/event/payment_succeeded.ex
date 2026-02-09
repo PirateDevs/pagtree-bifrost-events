@@ -1,9 +1,9 @@
-defmodule Bifrost.Event.PaymentSucceeded do
+defmodule Tesseract.Event.PaymentSucceeded do
   @moduledoc ~S"""
   Event emitted when a payment has succeeded.
   """
 
-  use Bifrost.Event.Notation
+  use Tesseract.Event.Notation
 
   defevent end_to_end_id: Zc.non_empty_string() |> Z.optional(),
            # ↑ only available on pix payments

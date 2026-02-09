@@ -1,12 +1,13 @@
 [
   inputs: ["*.{ex,exs}", "{config,lib,test}/**/*.{ex,exs}"],
+  subdirectories: [],
   excludes: [
     "lib/bifrost/event.ex",
-    "lib/bifrost/model.ex"
+    "lib/bifrost/inbox.ex",
+    "lib/bifrost/outbox.ex"
   ],
-  subdirectories: [],
+  import_deps: [:ecto],
   plugins: [],
-  import_deps: [],
   line_length: 140,
   locals_without_parens: [
     defevent: 1

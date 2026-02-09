@@ -1,9 +1,9 @@
-defmodule Bifrost.Event.SettlementCreated do
+defmodule Tesseract.Event.SettlementCreated do
   @moduledoc ~S"""
   Event emitted when a Settlement has been created.
   """
 
-  use Bifrost.Event.Notation
+  use Tesseract.Event.Notation
 
   defevent currency: Zc.currency(),
            amount: Zc.money(:cents),

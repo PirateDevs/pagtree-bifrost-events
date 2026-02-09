@@ -1,9 +1,9 @@
-defmodule BifrostCommons.MixProject do
+defmodule TesseractEmbedded.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :bifrost_events,
+      app: :tesseract_embedded,
       version: "1.2.6",
       elixir: "~> 1.19",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -15,8 +15,6 @@ defmodule BifrostCommons.MixProject do
     [
       {:ecto, "~> 3.13"},
       {:jason, "~> 1.4"},
-      {:plug, "~> 1.19"},
-      {:req, "~> 0.5"},
       {:zot, ">= 0.0.0"}
     ]
   end

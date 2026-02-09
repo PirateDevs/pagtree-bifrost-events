@@ -1,4 +1,4 @@
-defmodule Bifrost.Event.ZotCustom do
+defmodule Tesseract.Event.ZotCustom do
   @moduledoc ~S"""
   Zot custom types.
   """
@@ -34,7 +34,7 @@ defmodule Bifrost.Event.ZotCustom do
       Z.string(max: 255),
       Z.number(),
       Z.boolean(),
-      # ↓ throw away invalid values
+      # ↓ throwd away invalid values
       Z.any() |> Z.transform({__MODULE__, :__nil__, []})
     ]
     |> Z.union()

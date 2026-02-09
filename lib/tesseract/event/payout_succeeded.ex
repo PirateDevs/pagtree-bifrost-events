@@ -1,9 +1,9 @@
-defmodule Bifrost.Event.PayoutSucceeded do
+defmodule Tesseract.Event.PayoutSucceeded do
   @moduledoc ~S"""
   Event emitted when a Payout has succeeded.
   """
 
-  use Bifrost.Event.Notation
+  use Tesseract.Event.Notation
 
   defevent end_to_end_id: Zc.non_empty_string() |> Z.optional(),
            # ↑ 1. only available to pix payouts

@@ -1,9 +1,9 @@
-defmodule Bifrost.Event.SettlementSucceeded do
+defmodule Tesseract.Event.SettlementSucceeded do
   @moduledoc ~S"""
   Event emitted when a Settlement has succeeded.
   """
 
-  use Bifrost.Event.Notation
+  use Tesseract.Event.Notation
 
   @split Z.strict_map(%{
            provider_id: Zc.non_empty_string(),

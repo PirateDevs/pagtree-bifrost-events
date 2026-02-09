@@ -1,9 +1,9 @@
-defmodule Bifrost.Event.DepositSucceeded do
+defmodule Tesseract.Event.DepositSucceeded do
   @moduledoc ~S"""
   Event emitted when a deposit has succeeded.
   """
 
-  use Bifrost.Event.Notation
+  use Tesseract.Event.Notation
 
   defevent paid_amount: Zc.money(:cents),
            provider_pricing_percentage: Zc.percentage(),
