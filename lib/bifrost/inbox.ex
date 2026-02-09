@@ -1,6 +1,6 @@
-defmodule Tesseract.Inbox do
+defmodule Bifrost.Inbox do
   @moduledoc ~S"""
-  Incomming events from Tesseract.
+  Incomming events from Bifrost.
   """
 
   use Ecto.Schema

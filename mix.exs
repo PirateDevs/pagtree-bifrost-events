@@ -4,7 +4,7 @@ defmodule TesseractEmbedded.MixProject do
   def project do
     [
       app: :tesseract_embedded,
-      version: "1.3.0",
+      version: "1.4.0",
       elixir: "~> 1.19",
       elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps()

@@ -1,6 +1,6 @@
-defmodule Tesseract.Outbox do
+defmodule Bifrost.Outbox do
   @moduledoc ~S"""
-  Outgoing events to Tesseract.
+  Outgoing events to Bifrost.
   """
 
   use Ecto.Schema
