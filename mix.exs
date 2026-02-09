@@ -15,6 +15,7 @@ defmodule TesseractEmbedded.MixProject do
     [
       {:ecto, "~> 3.13"},
       {:jason, "~> 1.4"},
+      {:plug, "~> 1.19"},
       {:zot, ">= 0.0.0"}
     ]
   end
