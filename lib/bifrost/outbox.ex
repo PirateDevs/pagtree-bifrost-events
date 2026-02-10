@@ -101,8 +101,7 @@ defmodule Bifrost.Outbox do
     filters
     |> query()
     |> repo.all()
-    |> Enum.map(&Map.delete(Map.from_struct(&1), :__meta__))
-    |> Enum.map(&parse!/1)
+    |> Enum.map(&to_event!/1)
   end
 
   @doc ~S"""
@@ -134,5 +133,17 @@ defmodule Bifrost.Outbox do
     |> Enum.map(&from_etf!/1)
     |> Enum.map(&to_map/1)
     |> ingest(repo)
+  end
+
+  @doc ~S"""
+  Converts an outbox record into a Bifrost Event struct.
+  """
+  @spec to_event!(t) :: Bifrost.Event.t()
+
+  def to_event!(%Outbox{} = record) do
+    record
+    |> Map.from_struct()
+    |> Map.delete(:__meta__)
+    |> parse!()
   end
 end
