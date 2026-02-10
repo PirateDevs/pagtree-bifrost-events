@@ -31,7 +31,7 @@ defmodule Bifrost.Migration do
       # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
       create table(:bifrost_outbox, primary_key: false) do
-        add :id, :id, primary_key: true
+        add :id, :identity, primary_key: true
         add :type, :string, size: 64, null: false
         add :merchant_id, :string, size: 36, null: false
         add :env_type, :string, size: 8, null: false
