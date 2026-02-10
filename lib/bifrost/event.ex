@@ -1,6 +1,6 @@
 defmodule Bifrost.Event do
   @moduledoc ~S"""
-  Captures an atomic-change event within the system.
+  A snapshot of an atomic-change event within the system.
   """
 
   alias __MODULE__, as: Event
@@ -35,6 +35,11 @@ defmodule Bifrost.Event do
   @callback parse!(map) :: struct
 
   @doc ~S"""
+  Converts the event payload to a plain map.
+  """
+  @callback to_map(struct) :: map
+
+  @doc ~S"""
   We keep the `:subject_id` property at the top level so it's easier
   to check for duplicated events by indexing on `[:subject_id, :type]`
   (assumes `:subject_id` is unique across all partitions).
@@ -48,15 +53,6 @@ defmodule Bifrost.Event do
           payload: struct,
           timestamp: DateTime.t()
         }
-
-  @derive {Jason.Encoder, only: ~w(id type merchant_id env_type subject_id payload timestamp)a}
-  defstruct id: nil,
-            type: nil,
-            merchant_id: nil,
-            env_type: nil,
-            subject_id: nil,
-            payload: nil,
-            timestamp: nil
 
   @envs [:live, :sandbox]
 
@@ -75,15 +71,15 @@ defmodule Bifrost.Event do
   #    event modules for reference.                                 #
   # 2. Alias the event module at the top of this file. Keep it      #
   #    sorted alphabetically!                                       #
-  # 3. Add the event to the `@types` below where the key is the     #
-  #    atom event name and the value is the module. Keep it sorted  #
-  #    alphabetically and keep the formatting!                      #
+  # 3. Add the event to the `@types_mapping` below where the key    #
+  #    is the atom event name and the value is the module. Keep it  #
+  #    sorted alphabetically and keep the formatting!               #
   # 4. Add the event to the `@schema` distinct union below. See     #
   #    other events for reference and keep it sorted                #
   #    alphabetically!                                              #
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-  @types [
+  @types_mapping [
     deposit_created:      DepositCreated,
     deposit_succeeded:    DepositSucceeded,
     payment_canceled:     PaymentCanceled,
@@ -97,6 +93,8 @@ defmodule Bifrost.Event do
     settlement_created:   SettlementCreated,
     settlement_succeeded: SettlementSucceeded
   ]
+
+  @types Keyword.keys(@types_mapping)
 
   # #
   # **IMPORTANT:**
@@ -119,12 +117,49 @@ defmodule Bifrost.Event do
             Z.strict_map(%{type: Z.literal(:settlement_succeeded), payload: SettlementSucceeded.meta(:schema)}) |> Z.merge(@base),
           ])
 
+  @derive {Jason.Encoder, only: ~w(id type merchant_id env_type subject_id payload timestamp)a}
+  defstruct id: nil,
+            type: nil,
+            merchant_id: nil,
+            env_type: nil,
+            subject_id: nil,
+            payload: nil,
+            timestamp: nil
+
   @doc ~S"""
   Pattern matches an event by its payload module.
   """
   defmacro event(mod) do
     quote do
       %unquote(__MODULE__){payload: %unquote(mod){}}
+    end
+  end
+
+  @doc ~S"""
+  Deserializes an External Term Format (ETF) binary into an event.
+  """
+  @spec from_etf(binary) :: {:ok, t} | {:error, reason | Exception.t()}
+        when reason: :not_an_event
+
+  def from_etf(binary) when is_binary(binary) do
+    case :erlang.binary_to_term(binary) do
+      %Event{} = event -> {:ok, event}
+      _ -> {:error, :not_an_event}
+    end
+  rescue
+    reason -> {:error, reason}
+  end
+
+  @doc ~S"""
+  Same as `from_etf/1` but raises on errors.
+  """
+  @spec from_etf!(binary) :: t
+
+  def from_etf!(binary) when is_binary(binary) do
+    case from_etf(binary) do
+      {:ok, event} -> event
+      {:error, :not_an_event} -> raise("The given ETF binary is not a Bifrost Event")
+      {:error, reason} -> raise("Failed to deserialize Bifrost Event from ETF: #{Exception.format(:error, reason)}")
     end
   end
 
@@ -137,7 +172,7 @@ defmodule Bifrost.Event do
 
   def meta(:envs), do: @envs
   def meta(:schema), do: @schema
-  def meta(:types), do: Keyword.keys(@types)
+  def meta(:types), do: @types
 
   @doc ~S"""
   Parses and validates the given params into a `Bifrost.Event`.
@@ -149,7 +184,7 @@ defmodule Bifrost.Event do
          do: {:ok, struct!(__MODULE__, %{data | payload: s!(data.type, data.payload)})}
   end
 
-  for {event, mod} <- @types do
+  for {event, mod} <- @types_mapping do
     defp s!(unquote(event), payload), do: struct!(unquote(mod), payload)
   end
 
@@ -164,5 +199,23 @@ defmodule Bifrost.Event do
       {:ok, event} -> event
       {:error, issues} -> raise(Zot.Issue.pretty_print(issues))
     end
+  end
+
+  @doc ~S"""
+  Serializes the given event as Erlang's External Term Format (ETF).
+  """
+  @spec to_etf(t) :: binary
+
+  def to_etf(%Event{} = event), do: :erlang.term_to_binary(event)
+
+  @doc ~S"""
+  Converts the event into a plain map.
+  """
+  @spec to_map(t) :: map
+
+  def to_map(%Event{} = event) do
+    event
+    |> Map.from_struct()
+    |> Map.update!(:payload, fn %mod{} = payload -> mod.to_map(payload) end)
   end
 end

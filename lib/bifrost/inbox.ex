@@ -7,9 +7,10 @@ defmodule Bifrost.Inbox do
 
   import Ecto.Changeset
   import Ecto.Query
-  import Bifrost.Event, only: [parse!: 1]
+  import Bifrost.Event, only: [from_etf!: 1, parse!: 1, to_map: 1]
 
   alias __MODULE__
+  alias Bifrost.Event
 
   @typedoc ~S"""
   """
@@ -105,18 +106,30 @@ defmodule Bifrost.Inbox do
   Ingests a set of events into the inbox, returning the number of new
   records created. Duplicated events are ignored.
   """
-  @spec ingest(repo, [raw_event, ...]) :: {:ok, non_neg_integer} | {:error, reason :: term}
-        when repo: Ecto.Repo.t(),
-             raw_event: map
+  @spec ingest([etf, ...] | [map, ...] | [event, ...], repo) ::
+          {:ok, created_count :: non_neg_integer}
+          | {:error, reason :: term}
+        when etf: binary,
+             event: Bifrost.Event.t(),
+             repo: Ecto.Repo.t()
 
-  @schema Bifrost.Event.meta(:schema)
-          |> Zot.list()
+  def ingest([], _), do: {:ok, 0}
 
-  def ingest(_, []), do: {:ok, 0}
-
-  def ingest(repo, [_ | _] = events) do
-    with {:ok, events} <- Zot.parse(@schema, events, coerce: true),
-         {n, _} <- repo.insert_all(Inbox, events, conflict_target: :id, on_conflict: :nothing),
+  def ingest([%{} = event | _] = events, repo) when is_non_struct_map(event) do
+    with {n, _} <- repo.insert_all(Inbox, events, conflict_target: :id, on_conflict: :nothing),
          do: {:ok, n}
+  end
+
+  def ingest([%Event{} | _] = events, repo) do
+    events
+    |> Enum.map(&to_map/1)
+    |> ingest(repo)
+  end
+
+  def ingest([<<_, _::binary>> | _] = etfs, repo) do
+    etfs
+    |> Enum.map(&from_etf!/1)
+    |> Enum.map(&to_map/1)
+    |> ingest(repo)
   end
 end
