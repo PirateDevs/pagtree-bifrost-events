@@ -4,7 +4,7 @@ defmodule BifrostCommons.MixProject do
   def project do
     [
       app: :bifrost_commons,
-      version: "1.6.2",
+      version: "1.7.0",
       elixir: "~> 1.19",
       elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps()
