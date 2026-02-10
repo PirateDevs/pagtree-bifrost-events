@@ -103,4 +103,23 @@ defmodule Bifrost.Outbox do
     |> Enum.map(&Map.delete(Map.from_struct(&1), :__meta__))
     |> Enum.map(&parse!/1)
   end
+
+  @doc ~S"""
+  Ingests a set of events into the outbox, returning the number of new
+  records created. Duplicated events are ignored.
+  """
+  @spec ingest(repo, [raw_event, ...]) :: {:ok, non_neg_integer} | {:error, reason :: term}
+        when repo: Ecto.Repo.t(),
+             raw_event: map
+
+  @schema Bifrost.Event.meta(:schema)
+          |> Zot.list()
+
+  def ingest(_, []), do: {:ok, 0}
+
+  def ingest(repo, [_ | _] = events) do
+    with {:ok, events} <- Zot.parse(@schema, events, coerce: true),
+         {n, _} <- repo.insert_all(Outbox, events, conflict_target: [:subject_id, :type], on_conflict: :nothing),
+         do: {:ok, n}
+  end
 end
