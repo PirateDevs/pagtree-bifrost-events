@@ -115,23 +115,28 @@ defmodule Bifrost.Outbox do
              event: Bifrost.Event.t(),
              repo: Ecto.Repo.t()
 
+  @schema Bifrost.Event.meta(:schema)
+          |> Zot.omit([:id])
+          |> Zot.list()
+
   def ingest([], _), do: {:ok, 0}
 
   def ingest([%{} = event | _] = events, repo) when is_non_struct_map(event) do
-    with {n, _} <- repo.insert_all(Outbox, events, conflict_target: [:subject_id, :type], on_conflict: :nothing),
+    with {:ok, events} <- Zot.parse(@schema, events, coerce: true),
+         {n, _} <- repo.insert_all(Outbox, events, conflict_target: [:subject_id, :type], on_conflict: :nothing),
          do: {:ok, n}
   end
 
   def ingest([%Event{} | _] = events, repo) do
-    events
-    |> Enum.map(&to_map/1)
-    |> ingest(repo)
+    events = Enum.map(events, &to_map/1)
+
+    with {n, _} <- repo.insert_all(Outbox, events, conflict_target: [:subject_id, :type], on_conflict: :nothing),
+         do: {:ok, n}
   end
 
   def ingest([<<_, _::binary>> | _] = etfs, repo) do
     etfs
     |> Enum.map(&from_etf!/1)
-    |> Enum.map(&to_map/1)
     |> ingest(repo)
   end
 
