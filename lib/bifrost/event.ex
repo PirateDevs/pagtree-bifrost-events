@@ -6,6 +6,7 @@ defmodule Bifrost.Event do
   alias __MODULE__, as: Event
   alias Bifrost.Event.DepositCreated
   alias Bifrost.Event.DepositSucceeded
+  alias Bifrost.Event.GoalRewarded
   alias Bifrost.Event.PaymentCanceled
   alias Bifrost.Event.PaymentCreated
   alias Bifrost.Event.PaymentRefunded
@@ -82,6 +83,7 @@ defmodule Bifrost.Event do
   @types_mapping [
     deposit_created:      DepositCreated,
     deposit_succeeded:    DepositSucceeded,
+    goal_rewarded:        GoalRewarded,
     payment_canceled:     PaymentCanceled,
     payment_created:      PaymentCreated,
     payment_refunded:     PaymentRefunded,
